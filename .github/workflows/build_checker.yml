@@ -1,0 +1,21 @@
+name: build_checker
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  build_checker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dotnet-format
+        run: dotnet tool install -g dotnet-format
+      - name: Check if there are any changes
+        id: verify-diff
+        run: |
+          git diff --quiet . || echo "changed=true" >> $GITHUB_ENV
+      - name: Build project
+        if: steps.verify-diff.outputs.changed == 'true'
+        run: |
+          dotnet build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
