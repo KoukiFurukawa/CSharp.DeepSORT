@@ -1,4 +1,4 @@
-name: build_checker
+name: auto_test
 on:
   pull_request:
     branches: [main]
