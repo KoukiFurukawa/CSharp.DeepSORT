@@ -29,9 +29,6 @@ jobs:
       - name: Install dotnet-format
         run: dotnet tool install -g dotnet-format
 
-      - name: Restore
-        run: dotnet restore
-
       - name: Format only changed file
         run : |
           for file in ${{ steps.changed-files.outputs.all_changed_files }}
