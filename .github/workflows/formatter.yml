@@ -16,21 +16,6 @@ jobs:
         with:
           dotnet-version: 8.0.x
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v44
-        # To compare changes between the current commit and the last pushed remote commit set `since_last_remote_commit: true`. e.g
-        # with:
-        #   since_last_remote_commit: true 
-
-      - name: List all changed files
-        env:
-          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-        run: |
-          for file in ${ALL_CHANGED_FILES}; do
-            echo "$file was changed"
-          done
-
       - name: Install dotnet-format
         run: dotnet tool install -g dotnet-format
 
