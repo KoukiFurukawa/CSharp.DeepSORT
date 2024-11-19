@@ -3,9 +3,16 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DeepSORT.Application\DeepSORT.Application.csproj" />
+    <ProjectReference Include="..\DeepSORT.Domain\DeepSORT.Domain.csproj" />
+    <ProjectReference Include="..\DeepSORT.Infrastructure\DeepSORT.Infrastructure.csproj" />
+  </ItemGroup>
 
 </Project>

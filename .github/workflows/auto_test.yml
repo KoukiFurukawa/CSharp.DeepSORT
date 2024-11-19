@@ -1,0 +1,23 @@
+name: auto_test
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  build_checker:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install dotnet-format
+        run: dotnet tool install -g dotnet-format
+
+      - name: Test
+        run: |
+          dotnet test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

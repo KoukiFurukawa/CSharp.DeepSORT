@@ -4,44 +4,23 @@ on:
     branches: [main]
 jobs:
   formatter:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     outputs:
       changed: ${{ steps.verify-diff.outputs.changed }}
 
     steps: 
       - uses: actions/checkout@v4
 
-      - name: Get changed files
-        id: changed-files
-        uses: tj-actions/changed-files@v44
-        # To compare changes between the current commit and the last pushed remote commit set `since_last_remote_commit: true`. e.g
-        # with:
-        #   since_last_remote_commit: true 
-
-      - name: List all changed files
-        env:
-          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
-        run: |
-          for file in ${ALL_CHANGED_FILES}; do
-            echo "$file was changed"
-          done
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
 
       - name: Install dotnet-format
         run: dotnet tool install -g dotnet-format
 
-      - name: Restore
-        run: dotnet restore
-
-      - name: Format only changed file
-        run : |
-          for file in ${{ steps.changed-files.outputs.all_changed_files }}
-          do
-          dotnet format --include $file
-          done
-      
-      - name: Format files on previous tool
-        run: |
-          dotnet-format
+      - name: Format files
+        run: dotnet format CSharpDeepSORT.sln
 
       - name: Check if there are any changes
         id: verify-diff
