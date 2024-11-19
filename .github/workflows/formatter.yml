@@ -1,0 +1,61 @@
+name: format_and_commit
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  formatter:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.verify-diff.outputs.changed }}
+
+    steps: 
+      - uses: actions/checkout@v4
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v44
+        # To compare changes between the current commit and the last pushed remote commit set `since_last_remote_commit: true`. e.g
+        # with:
+        #   since_last_remote_commit: true 
+
+      - name: List all changed files
+        env:
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          for file in ${ALL_CHANGED_FILES}; do
+            echo "$file was changed"
+          done
+
+      - name: Install dotnet-format
+        run: dotnet tool install -g dotnet-format
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Format only changed file
+        run : |
+          for file in ${{ steps.changed-files.outputs.all_changed_files }}
+          do
+          dotnet format --include $file
+          done
+      
+      - name: Format files on previous tool
+        run: |
+          dotnet-format
+
+      - name: Check if there are any changes
+        id: verify-diff
+        run: |
+          git diff --quiet . || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Auto-commit if changes
+        if: steps.verify-diff.outputs.changed == 'true'
+        run: |
+          git pull origin ${{ github.head_ref }}
+          git config user.email "action@github.com"
+          git config user.name "GitHub Action"
+          git add .
+          git commit -m "fixed by code formatter"
+          git push origin HEAD:${{ github.head_ref }}
+        env :
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
