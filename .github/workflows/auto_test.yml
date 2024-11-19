@@ -16,8 +16,8 @@ jobs:
       - name: Install dotnet-format
         run: dotnet tool install -g dotnet-format
 
-      - name: Build
+      - name: Test
         run: |
-          dotnet build
+          dotnet test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

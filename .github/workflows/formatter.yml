@@ -11,6 +11,11 @@ jobs:
     steps: 
       - uses: actions/checkout@v4
 
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@v44
