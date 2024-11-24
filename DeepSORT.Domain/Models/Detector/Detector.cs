@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using OpenCvSharp;
+using OpenCvSharp.Dnn;
 using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using System.Diagnostics;
@@ -18,6 +19,8 @@ public class Detector
     private readonly string _inputName;
     private readonly int[] _inputShape;
     private readonly string _outputName;
+    private readonly double confThreshold = 0.2;
+    private readonly double iouThreshold = 0.3;
 
     public Detector(ModelPath modelPath)
     {
@@ -27,32 +30,70 @@ public class Detector
         this._outputName = GetModelOutputInfo();
     }
 
-    public (List<Rect>, List<double>, List<int>) Inference(Mat image)
+    public (List<Rect>, List<float>, List<int>) Inference(Mat image)
     {
         Mat tempImage = image.Clone();
-        int imageHeight = tempImage.Rows;
-        int imageWidth = tempImage.Cols;
+        int imgHeight = tempImage.Height;
+        int imgWidth = tempImage.Width;
 
-        var (processedImage, ratio) = Preprocess(tempImage);
+        // var processedImage = this.Preprocess(tempImage);
 
-        // Tensorに変換する前にバイト配列の長さを確認し、Matの生データを取得
-        var processedBytes = new byte[processedImage.Total() * processedImage.ElemSize()];
-        Marshal.Copy(processedImage.Data, processedBytes, 0, processedBytes.Length);
+        var inputTensor = this.PrepareInput(tempImage);
+        var inputs = new List<NamedOnnxValue>
+        {
+            NamedOnnxValue.CreateFromTensor(_inputName, inputTensor)
+        };
 
-        var inputTensor = new DenseTensor<byte>(processedBytes, _inputShape);
-        var input = NamedOnnxValue.CreateFromTensor(_inputName, inputTensor);
+        using var results = _onnxSession.Run(inputs);
 
-        using var results = _onnxSession.Run([input]);
+        var output = results[0].AsTensor<float>();
+        var shape = output.Dimensions;
 
-        var test = results.First(v => v.Name == _outputName);
-        var test2 = results.Where(v => v.Name == _outputName);
-        var test3 = test2.SelectMany(v => ((DenseTensor<float>)v.Value).ToArray());
-        var test4 = test3.Select(Convert.ToDouble);
-        var test5 = test4.ToList();
+        return this.ProcessOutput(output, imgHeight, imgWidth);
+    }
 
-        var output = test5 == null ? [] : test5.ToArray();
+    public void Close()
+    {
+        this._onnxSession.Dispose();
+    }
 
-        return Postprocess(output, ratio, imageWidth, imageHeight);
+    private Tensor<float> PrepareInput(Mat image)
+    {
+        Mat inputImg = new Mat();
+        Cv2.CvtColor(image, inputImg, ColorConversionCodes.BGR2RGB);
+
+        Cv2.Resize(inputImg, inputImg, new Size(640, 640));
+
+        inputImg.ConvertTo(inputImg, MatType.CV_32FC3, 1.0 / 255.0);
+
+        // var channels = Cv2.Split(inputImg); // Split the channels (HWC -> CHW)
+        var inputTensor = new DenseTensor<float>([1, 3, this._inputShape[2], this._inputShape[3]]);
+
+        /*for (int c = 0; c < 3; c++)
+        {
+            for (int h = 0; h < this._inputShape[2]; h++)
+            {
+                for (int w = 0; w < this._inputShape[3]; w++)
+                {
+                    inputTensor[0, c, h, w] = (float)channels[c].At<float>(h, w);
+                }
+            }
+        }*/
+
+        // var inputTensor = CvDnn.BlobFromImage(inputImg, 1.0, new Size(640, 640), new Scalar(), true, false);
+
+        for (int y = 0; y < 640; y++)
+        {
+            for (int x = 0; x < 640; x++)
+            {
+                var pixel = inputImg.At<Vec3f>(y, x);
+                inputTensor[0, 0, y, x] = pixel.Item0;
+                inputTensor[0, 1, y, x] = pixel.Item1;
+                inputTensor[0, 2, y, x] = pixel.Item2;
+            }
+        }
+
+        return inputTensor;
     }
 
 
@@ -84,41 +125,139 @@ public class Detector
         throw new Exception("Model does not have any outputs.");
     }
 
-
-    private (Mat, float) Preprocess(Mat image)
+    private (List<Rect>, List<float>, List<int>) ProcessOutput(Tensor<float> output, int imgHeight, int imgWidth)
     {
-        float ratio = Math.Min((float)_inputShape[0] / image.Rows, (float)_inputShape[1] / image.Cols);
-        var resizedImage = image.Resize(new Size((int)(image.Cols * ratio), (int)(image.Rows * ratio)));
-
-        Mat paddedImage = new Mat(new Size(_inputShape[1], _inputShape[0]), MatType.CV_8UC3, Scalar.All(114));
-        resizedImage.CopyTo(paddedImage[new Rect(0, 0, resizedImage.Cols, resizedImage.Rows)]);
-
-        return (paddedImage, ratio);
-    }
-
-
-    private static (List<Rect>, List<double>, List<int>) Postprocess(double[] outputs, float ratio, int maxWidth, int maxHeight)
-    {
-        var bboxes = new List<Rect>();
-        var scores = new List<double>();
-        var classIds = new List<int>();
-
-        for (int i = 0; i < outputs.Length; i += 6)
+        float[][] predictions = SqueezeAndTransposeTensor(output); // 転置も一緒にしてる
+        int numPredictions = predictions[0].Length;
+        int numAttributes = predictions.Length;
+        var scores = new float[numAttributes];
+        for (int i = 0; i < numAttributes; i++)
         {
-            double score = outputs[i + 4];
-            if (score > 0.5)
+            // scores[i] = predictions[i].Skip(4).Max();
+            float maxScore = float.MinValue;
+            for (int j = 4; j < numPredictions; j++)
             {
-                int xMin = Math.Max(0, (int)(outputs[i] / ratio));
-                int yMin = Math.Max(0, (int)(outputs[i + 1] / ratio));
-                int xMax = Math.Min(maxWidth, (int)(outputs[i + 2] / ratio));
-                int yMax = Math.Min(maxHeight, (int)(outputs[i + 3] / ratio));
+                if (predictions[i][j] > maxScore && predictions[i][j] < 1)
+                {
+                    maxScore = predictions[i][j];
+                }
+            }
+            scores[i] = maxScore;
+        }
 
-                bboxes.Add(new Rect(xMin, yMin, xMax - xMin, yMax - yMin));
-                scores.Add(score);
-                classIds.Add((int)outputs[i + 5]);
+        var filteredPredictions = new List<float[]>();
+        var filteredScores = new List<float>();
+        var filteredIndices = new List<int>();
+
+        for (int i = 0; i < numAttributes; i++)
+        {
+            if (scores[i] > this.confThreshold)
+            {
+                var prediction = new float[numPredictions];
+                for (int j = 0; j < numPredictions; j++)
+                {
+                    prediction[j] = predictions[i][j];
+                }
+                filteredPredictions.Add(prediction);
+                filteredScores.Add(scores[i]);
+                filteredIndices.Add(i);
             }
         }
 
-        return (bboxes, scores, classIds);
+        if (filteredIndices.Count == 0)
+        {
+            return (new List<Rect>(), new List<float>(), new List<int>());
+        }
+
+        var classIds = new List<int>();
+        foreach (var prediction in filteredPredictions)
+        {
+            var classId = Array.IndexOf(prediction.Skip(4).ToArray(), prediction.Skip(4).Max());
+            classIds.Add(classId);
+        }
+
+        // Extract bounding boxes
+        var boxes = ExtractBoxes(filteredPredictions);
+        boxes = RescaleBoxes(boxes, imgHeight, imgWidth);
+
+        // Apply Non-Maximum Suppression (NMS)
+        var indices = Utils.MulticlassNms(boxes, filteredScores, classIds, this.iouThreshold);
+
+        return (
+            indices.Select(i => boxes[i]).ToList(),
+            indices.Select(i => scores[i]).ToList(),
+            indices.Select(i => classIds[i]).ToList()
+        );
+    }
+
+    private List<Rect> ExtractBoxes(List<float[]> predictions)
+    {
+        var boxes = new List<Rect>();
+
+        foreach (var prediction in predictions)
+        {
+            var x = prediction[0];
+            var y = prediction[1];
+            var width = prediction[2];
+            var height = prediction[3];
+            var rect = new Rect((int)x, (int)y, (int)width, (int)height);
+            boxes.Add(rect);
+        }
+        return boxes;
+    }
+
+    public List<Rect> RescaleBoxes(List<Rect> boxes, int imgHeight, int imgWidth)
+    {
+        var inputShape = new float[] { 640, 640, 640, 640 };
+
+        var rescaledBoxes = new List<Rect>();
+        foreach (var box in boxes)
+        {
+            var x = box.X / inputShape[0] * imgWidth;
+            var y = box.Y / inputShape[1] * imgHeight;
+            var width = box.Width / inputShape[2] * imgWidth;
+            var height = box.Height / inputShape[3] * imgHeight;
+
+            rescaledBoxes.Add(new Rect((int)x, (int)y, (int)width, (int)height));
+        }
+
+        return rescaledBoxes;
+    }
+
+    private float[][] SqueezeTensor(Tensor<float> tensor)
+    {
+        float[][] tensorT = new float[tensor.Dimensions[2]][];
+
+        for (int w = 0; w < tensor.Dimensions[2]; w++)
+        {
+            tensorT[w] = new float[tensor.Dimensions[1]];
+            for (int h = 0; h < tensor.Dimensions[1]; h++)
+            {
+                tensorT[w][h] = tensor[0, h, w];
+            }
+        }
+
+        return tensorT;
+    }
+
+    private float[][] SqueezeAndTransposeTensor(Tensor<float> tensor)
+    {
+        // Assuming tensor shape is (1, 84, 8400)
+        int channels = tensor.Dimensions[1]; // 84
+        int width = tensor.Dimensions[2];    // 8400
+
+        // Create a new 2D array for the transposed tensor
+        float[][] tensorT = new float[width][];
+
+        for (int w = 0; w < width; w++)
+        {
+            tensorT[w] = new float[channels];
+            for (int c = 0; c < channels; c++)
+            {
+                tensorT[w][c] = tensor[0, c, w];
+            }
+        }
+
+        return tensorT;
     }
 }
