@@ -3,3 +3,6 @@
 bin/
 obj/
 *.user
+__pycache__/
+*.pt
+*.onnx
