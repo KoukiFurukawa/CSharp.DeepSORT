@@ -23,7 +23,7 @@ public class WebCameraFps : ValueObject<int, WebCameraFps>
 
     private void Validate(int value)
     {
-        if (value < 0) { throw new ArgumentException("FPS には 1以上30以下 を指定してください"); }
+        if (value < 1) { throw new ArgumentException("FPS には 1以上30以下 を指定してください"); }
         if (value > 30) { throw new ArgumentException("FPS には 1以上30以下 を指定してください"); }
     }
 }

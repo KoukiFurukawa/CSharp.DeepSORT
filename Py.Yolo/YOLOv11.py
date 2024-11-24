@@ -32,7 +32,6 @@ class YOLOv11:
         # Perform inference on the image
         outputs = self.inference(input_tensor)
 
-        print(outputs)
         self.boxes, self.scores, self.class_ids = self.process_output(outputs)
 
         return self.boxes, self.scores, self.class_ids
@@ -61,6 +60,8 @@ class YOLOv11:
         return outputs
 
     def process_output(self, output):
+        
+        print("first-score", output[0].shape)
         predictions = np.squeeze(output[0]).T
 
         # Filter out object confidence scores below threshold
@@ -80,6 +81,7 @@ class YOLOv11:
         # Apply non-maxima suppression to suppress weak, overlapping bounding boxes
         # indices = nms(boxes, scores, self.iou_threshold)
         indices = multiclass_nms(boxes, scores, class_ids, self.iou_threshold)
+        print("indices", indices)
 
         return boxes[indices], scores[indices], class_ids[indices]
 
@@ -99,6 +101,7 @@ class YOLOv11:
 
         # Rescale boxes to original image dimensions
         input_shape = np.array([self.input_width, self.input_height, self.input_width, self.input_height])
+        print("rescale", input_shape, self.img_width, self.img_height)
         boxes = np.divide(boxes, input_shape, dtype=np.float32)
         boxes *= np.array([self.img_width, self.img_height, self.img_width, self.img_height])
         return boxes
