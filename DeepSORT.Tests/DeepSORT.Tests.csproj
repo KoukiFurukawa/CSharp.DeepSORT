@@ -17,6 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DeepSORT.Application\DeepSORT.Application.csproj" />
+    <ProjectReference Include="..\DeepSORT.Domain\DeepSORT.Domain.csproj" />
+    <ProjectReference Include="..\DeepSORT.Infrastructure\DeepSORT.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 
