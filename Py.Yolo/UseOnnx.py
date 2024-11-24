@@ -6,7 +6,7 @@ from onnxruntime.datasets import get_example
 import cv2
 from imread_from_url import imread_from_url
 
-from YOLOv8 import YOLOv11
+from YOLOv11 import YOLOv11
 
 # モデルとクラス情報のパス
 MODEL_PATH = "Py.Yolo/yolo11n.onnx"

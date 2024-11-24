@@ -6,7 +6,7 @@ import onnxruntime
 from utils import xywh2xyxy, draw_detections, multiclass_nms
 
 
-class YOLOv8:
+class YOLOv11:
 
     def __init__(self, path, conf_thres=0.7, iou_thres=0.5):
         self.conf_threshold = conf_thres
