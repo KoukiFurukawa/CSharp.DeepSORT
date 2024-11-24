@@ -14,4 +14,6 @@ public class Detector
     {
         this.modelPath = modelPath.GetValue();
     }
+
+
 }
