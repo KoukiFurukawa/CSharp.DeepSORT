@@ -25,7 +25,7 @@ jobs:
       - name: Check if there are any changes
         id: verify-diff
         run: |
-          git diff --quiet . || echo "changed=true" >> $GITHUB_OUTPUT
+          (git diff --name-only).Length -gt 0 | echo "changed=true" >> $env:GITHUB_OUTPUT
 
       - name: Auto-commit if changes
         if: steps.verify-diff.outputs.changed == 'true'
