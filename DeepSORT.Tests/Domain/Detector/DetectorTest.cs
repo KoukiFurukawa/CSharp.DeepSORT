@@ -23,7 +23,7 @@ public class DetectorTests
     {
         string modelPath = AppContext.BaseDirectory + "./models/yolo11n.onnx";
         this._mockModelPath = new ModelPath(modelPath);
-        _testOutputHelper = testOutputHelper;
+        this._testOutputHelper = testOutputHelper;
     }
 
     [Fact]
