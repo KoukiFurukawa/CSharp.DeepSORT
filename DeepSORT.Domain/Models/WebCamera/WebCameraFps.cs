@@ -9,7 +9,7 @@ namespace DeepSORT.Domain.Models.WebCamera;
 
 public class WebCameraFps : ValueObject<int, WebCameraFps>
 {
-    public int Value {  get; private set; }
+    public int Value { get; private set; }
     public WebCameraFps(int value)
     {
         Validate(value);

@@ -11,7 +11,7 @@ public class WebCamera
     private readonly int width = 640;
     private readonly int height = 480;
 
-    public WebCamera(WebCameraFps fps, int bufferSize=1)
+    public WebCamera(WebCameraFps fps, int bufferSize = 1)
     {
         this.fps = fps.GetValue();
         this.bufferSize = bufferSize;
@@ -40,9 +40,9 @@ public class WebCamera
 
     public (Mat image, Exception? err) GrabImage()
     {
-        Mat image = new ();
+        Mat image = new();
 
-        if (this.Capture == null) 
+        if (this.Capture == null)
         {
             return (image, new Exception("Webカメラを Open していません。"));
         }

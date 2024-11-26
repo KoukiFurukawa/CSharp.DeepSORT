@@ -5,7 +5,7 @@ public class WebCameraFactory : IWebCameraFactory
 {
     public WebCamera Create(WebCameraFps fps)
     {
-        WebCamera webCamera = new (fps);
+        WebCamera webCamera = new(fps);
         return webCamera;
     }
 }

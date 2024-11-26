@@ -1,15 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
-using OpenCvSharp;
-using Microsoft.ML.OnnxRuntime;
 using DeepSORT.Domain.Models.Detector;
-using System.Diagnostics;
-using Xunit.Abstractions;
-using Xunit.Sdk;
+using Microsoft.ML.OnnxRuntime;
 using Microsoft.ML.OnnxRuntime.Tensors;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using OpenCvSharp;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace DeepSORT.Test.Domain.DetectorTest;
 

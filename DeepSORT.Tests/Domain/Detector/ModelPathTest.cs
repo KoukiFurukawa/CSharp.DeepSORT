@@ -23,7 +23,7 @@ namespace DeepSORT.Test.Domain.DetectorTest
             Assert.Throws<ArgumentException>(() => new ModelPath(path_5));
 
             // 成功
-            ModelPath ModelPathId_1 = new (path_6);
+            ModelPath ModelPathId_1 = new(path_6);
             Assert.NotNull(ModelPathId_1);
         }
 
