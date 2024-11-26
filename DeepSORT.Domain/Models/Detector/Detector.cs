@@ -185,7 +185,7 @@ public class Detector
 
         return (
             indices.Select(i => boxes[i]).ToList(),
-            indices.Select(i => scores[i]).ToList(),
+            indices.Select(i => filteredScores[i]).ToList(),
             indices.Select(i => classIds[i]).ToList()
         );
     }
@@ -198,9 +198,21 @@ public class Detector
         {
             var x = prediction[0];
             var y = prediction[1];
-            var width = prediction[2];
-            var height = prediction[3];
-            var rect = new Rect((int)x, (int)y, (int)width, (int)height);
+            var w = prediction[2];
+            var h = prediction[3];
+            float top = y - h / 2;    // top
+            float left = x - w / 2;   // left
+            float width = w;          // width
+            float height = h;         // height
+
+            Rect rect = new Rect()
+            {
+                Top = (int)top,
+                Left = (int)left,
+                Width = (int)width,
+                Height = (int)height,
+            };
+
             boxes.Add(rect);
         }
         return boxes;
