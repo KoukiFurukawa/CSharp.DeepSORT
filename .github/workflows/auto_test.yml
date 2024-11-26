@@ -1,7 +1,7 @@
 name: auto_test
 on:
   pull_request:
-    branches: []
+    branches: [master]
 jobs:
   build_checker:
     runs-on: windows-latest
