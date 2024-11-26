@@ -35,11 +35,11 @@ jobs:
       - name: Auto-commit if changes
         if: steps.verify-diff.outputs.changed == 'true'
         run: |
-          git pull origin ${{ github.head_ref }}
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
           git add .
           git commit -m "fixed by code formatter"
+          git pull origin ${{ github.head_ref }}
           git push origin HEAD:${{ github.head_ref }}
         env :
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.WORKFLOW_TOKEN }}
