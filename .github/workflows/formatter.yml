@@ -39,7 +39,7 @@ jobs:
           git config user.name "GitHub Action"
           git add .
           git commit -m "fixed by code formatter"
-          git pull origin ${{ github.head_ref }}
+          git pull --rebase origin ${{ github.head_ref }}
           git push origin HEAD:${{ github.head_ref }}
         env :
           token: ${{ secrets.WORKFLOW_TOKEN }}
