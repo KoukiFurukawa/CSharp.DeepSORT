@@ -9,7 +9,7 @@ namespace DeepSORT.Domain.Models.WebCamera;
 
 public class WebCameraFps : ValueObject<int, WebCameraFps>
 {
-    public int Value {  get; private set; }
+    public int Value { get; private set; }
     public WebCameraFps(int value)
     {
         Validate(value);
@@ -23,7 +23,7 @@ public class WebCameraFps : ValueObject<int, WebCameraFps>
 
     private void Validate(int value)
     {
-        if (value < 0) { throw new ArgumentException("FPS には 1以上30以下 を指定してください"); }
+        if (value < 1) { throw new ArgumentException("FPS には 1以上30以下 を指定してください"); }
         if (value > 30) { throw new ArgumentException("FPS には 1以上30以下 を指定してください"); }
     }
 }

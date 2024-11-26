@@ -25,16 +25,21 @@ jobs:
       - name: Check if there are any changes
         id: verify-diff
         run: |
-          git diff --quiet . || echo "changed=true" >> $GITHUB_OUTPUT
+          $diff = git diff --name-only
+          if ($diff.Length -gt 0) {
+            echo "changed=true" >> $env:GITHUB_OUTPUT
+          } else {
+            echo "changed=false" >> $env:GITHUB_OUTPUT
+          }
 
       - name: Auto-commit if changes
         if: steps.verify-diff.outputs.changed == 'true'
         run: |
-          git pull origin ${{ github.head_ref }}
           git config user.email "action@github.com"
           git config user.name "GitHub Action"
           git add .
           git commit -m "fixed by code formatter"
+          git pull --rebase origin ${{ github.head_ref }}
           git push origin HEAD:${{ github.head_ref }}
         env :
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.WORKFLOW_TOKEN }}

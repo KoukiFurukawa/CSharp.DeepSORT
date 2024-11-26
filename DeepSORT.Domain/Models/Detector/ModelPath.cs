@@ -20,11 +20,11 @@ public class ModelPath : ValueObject<string, ModelPath>
         return this.Value;
     }
 
-    private void Validate(string value) 
+    private void Validate(string value)
     {
         ArgumentNullException.ThrowIfNullOrEmpty(value);
-        
-        if (!File.Exists(value)) 
+
+        if (!File.Exists(value))
         {
             throw new ArgumentException("指定したパスが無効です");
         }
