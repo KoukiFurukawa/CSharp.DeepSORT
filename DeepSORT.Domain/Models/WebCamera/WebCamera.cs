@@ -17,9 +17,14 @@ public class WebCamera
         this.bufferSize = bufferSize;
     }
 
-    public bool Open()
+    public (bool, Exception?) Open()
     {
         bool result;
+
+        if (this.Capture != null && this.Capture.IsOpened())
+        {
+            return (false, new Exception("Open済みのカメラを再度開こうとしています。"));
+        }
 
         try
         {
@@ -35,7 +40,7 @@ public class WebCamera
             throw new Exception("カメラ接続に失敗", ex);
         }
 
-        return result;
+        return (result, null);
     }
 
     public (Mat image, Exception? err) GrabImage()
@@ -44,7 +49,7 @@ public class WebCamera
 
         if (this.Capture == null)
         {
-            return (image, new Exception("Webカメラを Open していません。"));
+            return (image, new Exception("Webカメラを Open していないのに撮像しようとしています。"));
         }
 
         try
@@ -64,12 +69,17 @@ public class WebCamera
         }
     }
 
-    public void Close()
+    public Exception? Close()
     {
         if (Capture != null && Capture.IsOpened())
         {
             Capture.Release();
             Capture.Dispose();
+            return null;
+        }
+        else
+        {
+            return new Exception("Webカメラを Close しようとしていますが、Open されていません。");
         }
     }
 
