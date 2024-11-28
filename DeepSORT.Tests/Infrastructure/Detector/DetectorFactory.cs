@@ -1,5 +1,5 @@
-using DeepSORT.Infrastructure.Factory;
 using DeepSORT.Domain.Models.Detector;
+using DeepSORT.Infrastructure.Factory;
 using Xunit.Abstractions;
 
 namespace DeepSORT.Infrastructure.Test;
