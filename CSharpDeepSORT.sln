@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepSORT.Application", "Dee
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DeepSORT.Infrastructure", "DeepSORT.Infrastructure\DeepSORT.Infrastructure.csproj", "{1EACA685-2BF0-4F08-98CC-B278C5005CE3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepSORT.Library", "DeepSORT.Library\DeepSORT.Library.csproj", "{55B3244A-F16C-46A1-8783-4DB4887B07DC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{1EACA685-2BF0-4F08-98CC-B278C5005CE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1EACA685-2BF0-4F08-98CC-B278C5005CE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1EACA685-2BF0-4F08-98CC-B278C5005CE3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55B3244A-F16C-46A1-8783-4DB4887B07DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55B3244A-F16C-46A1-8783-4DB4887B07DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55B3244A-F16C-46A1-8783-4DB4887B07DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55B3244A-F16C-46A1-8783-4DB4887B07DC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
