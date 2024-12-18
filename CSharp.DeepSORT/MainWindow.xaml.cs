@@ -30,8 +30,11 @@ namespace Csharp.DeepSORT
             /*string modelPath2 = AppContext.BaseDirectory + "./models/resnet18-v1-7.onnx";*/
             string modelPath2 = AppContext.BaseDirectory + "./models/resnet18_conv5.onnx";
             this._mockModelPath = new ModelPath(modelPath);
+
+            ModelPath modelPathObj = new ModelPath(modelPath2);
+            ImagePath imagePathObj = new ImagePath(IMAGE_PATH2);
             Detector detector = new(this._mockModelPath);
-            Predictor predictor = new(modelPath2, IMAGE_PATH);
+            Predictor predictor = new(modelPathObj, imagePathObj);
             Mat image = Cv2.ImRead(IMAGE_PATH);
             var (bboxes, scores, classIds) = detector.Inference(image);
             Debug.WriteLine(bboxes.Count);
