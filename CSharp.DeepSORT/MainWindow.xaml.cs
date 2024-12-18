@@ -27,7 +27,8 @@ namespace Csharp.DeepSORT
         {
             InitializeComponent();
             string modelPath = AppContext.BaseDirectory + "./models/yolo11n.onnx";
-            string modelPath2 = AppContext.BaseDirectory + "./models/resnet18-v1-7.onnx";
+            /*string modelPath2 = AppContext.BaseDirectory + "./models/resnet18-v1-7.onnx";*/
+            string modelPath2 = AppContext.BaseDirectory + "./models/resnet18_conv5.onnx";
             this._mockModelPath = new ModelPath(modelPath);
             Detector detector = new(this._mockModelPath);
             Predictor predictor = new(modelPath2, IMAGE_PATH);
@@ -35,9 +36,15 @@ namespace Csharp.DeepSORT
             var (bboxes, scores, classIds) = detector.Inference(image);
             Debug.WriteLine(bboxes.Count);
 
-            var (label, features) = predictor.PredictAndExtractFeatures();
-            Debug.WriteLine(label);
-
+            try
+            {
+                var (label, features) = predictor.PredictAndExtractFeatures();
+                Debug.WriteLine(label);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
         }
     }
 }
