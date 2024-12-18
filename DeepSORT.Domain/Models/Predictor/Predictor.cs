@@ -1,17 +1,17 @@
 using DeepSORT.Domain.Models.Detector;
+using Microsoft.ML.OnnxRuntime;
+using Microsoft.ML.OnnxRuntime.Tensors;
+using OpenCvSharp;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
-using OpenCvSharp;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using Microsoft.ML.OnnxRuntime;
-using Microsoft.ML.OnnxRuntime.Tensors;
-using System.Diagnostics;
 
 
 namespace DeepSORT.Domain.Models.Predictor;
@@ -96,7 +96,7 @@ public class Predictor
                 }
             }
             pooledFeatures[c] = sum / hw; // 平均値を計算
-            }
+        }
 
         return pooledFeatures;
     }
