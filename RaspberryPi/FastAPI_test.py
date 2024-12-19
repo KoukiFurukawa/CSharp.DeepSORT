@@ -8,7 +8,7 @@ import keyboard
 import alert
 
 #警戒レベル
-level = 0
+level = None
 
 app = FastAPI()
 
@@ -26,30 +26,24 @@ def create_level(approach: Approach):
 #警戒レベルに応じてmp3を再生
 def ring_alert():
     global level
-    state = 0
+    prev_level = 0
     while not keyboard.is_pressed('q'):
-        #危険レベル0
-        if level == 0 and state != 0:
-            alert.mp3_stop()
-            state = 0
-        #危険レベル1
-        elif level == 1 and state != 1:
-            if state == 0:
-                alert.caution()
-            elif state == 2:
-                alert.mp3_stop()
-                alert.caution()
-            state = 1
-        #危険レベル2
-        elif level == 2 and state != 2:
-            if state == 0:
-                alert.warning()
-            elif state == 1:
-                alert.mp3_stop()
-                alert.warning()
-            state = 2
-
         time.sleep(0.01)
+
+        if level == prev_level:
+            continue
+        elif prev_level != None:
+            alert.mp3_stop()
+
+        #危険レベル1
+        if level == 1:
+            alert.caution()
+            
+        #危険レベル2
+        elif level == 2:    
+            alert.warning()
+
+        prev_level = level
 
 #ring_alertを実行するスレッド
 thread1=threading.Thread(target=ring_alert)
