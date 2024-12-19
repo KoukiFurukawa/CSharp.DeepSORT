@@ -26,7 +26,7 @@ def create_level(approach: Approach):
 #警戒レベルに応じてmp3を再生
 def ring_alert():
     global level
-    prev_level = 0
+    prev_level = None
     while not keyboard.is_pressed('q'):
         time.sleep(0.01)
 
