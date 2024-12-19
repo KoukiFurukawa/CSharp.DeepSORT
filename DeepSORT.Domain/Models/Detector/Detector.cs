@@ -36,8 +36,6 @@ public class Detector
         int imgHeight = tempImage.Height;
         int imgWidth = tempImage.Width;
 
-        // var processedImage = this.Preprocess(tempImage);
-
         var inputTensor = this.PrepareInput(tempImage);
         var inputs = new List<NamedOnnxValue>
         {
