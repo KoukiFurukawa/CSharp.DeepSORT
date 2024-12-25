@@ -20,14 +20,14 @@ namespace Csharp.DeepSORT
     /// </summary>
     public partial class MainWindow : System.Windows.Window
     {
-        private readonly ModelPath _mockModelPath;
+/*        private readonly ModelPath _mockModelPath;
         private readonly string IMAGE_PATH = AppContext.BaseDirectory + "./images/zidane.jpg";
-        private readonly string IMAGE_PATH2 = AppContext.BaseDirectory + "./images/dog.jpeg";
+        private readonly string IMAGE_PATH2 = AppContext.BaseDirectory + "./images/dog.jpeg";*/
         public MainWindow()
         {
             InitializeComponent();
-            string modelPath = AppContext.BaseDirectory + "./models/yolo11n.onnx";
-            /*string modelPath2 = AppContext.BaseDirectory + "./models/resnet18-v1-7.onnx";*/
+/*            string modelPath = AppContext.BaseDirectory + "./models/yolo11n.onnx";
+            *//*string modelPath2 = AppContext.BaseDirectory + "./models/resnet18-v1-7.onnx";*//*
             string modelPath2 = AppContext.BaseDirectory + "./models/resnet18_conv5.onnx";
             this._mockModelPath = new ModelPath(modelPath);
 
@@ -47,7 +47,7 @@ namespace Csharp.DeepSORT
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.Message);
-            }
+            }*/
         }
     }
 }
