@@ -5,6 +5,8 @@ using System.Drawing;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using Csharp.DeepSORT;
+using DeepSORT.Domain.Models.Detector;
+using DeepSORT.Domain.Models.Predictor;
 
 namespace CSharp.DeepSORT.ViewModels;
 public class MainWindowViewModel
@@ -12,10 +14,17 @@ public class MainWindowViewModel
     public CameraImage WebCamera { get; private set; }
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private object _lock = new object();
+    private Detector _detector { get; }
+    private Predictor _predictor { get; }
 
     public MainWindowViewModel()
     {
         this.WebCamera = new CameraImage(null, "web");
+        ModelPath detectorModelPath = new ModelPath(AppContext.BaseDirectory + "./models/yolo11n.onnx");
+        ModelPath predictorModelPath = new ModelPath(AppContext.BaseDirectory + "./models/resnet18_conv5.onnx");
+
+        this._detector = new(detectorModelPath);
+        this._predictor = new(predictorModelPath);
         Task.Run(StartCaptureImageAsync);
     }
 
@@ -51,7 +60,7 @@ public class MainWindowViewModel
                 {
                     image.Dispose();
                 }
-                await Task.Delay(100);  // 適宜待機時間を挿入
+                await Task.Delay(1);  // 適宜待機時間を挿入
             }
             videoCapture.Release();
         });
@@ -71,6 +80,7 @@ public class MainWindowViewModel
                         frame.Dispose();
                     });
                 }
+                await Task.Delay(1);
             }
         });
     }
