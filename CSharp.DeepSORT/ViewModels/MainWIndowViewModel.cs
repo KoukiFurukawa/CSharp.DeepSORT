@@ -7,6 +7,10 @@ using OpenCvSharp.Extensions;
 using Csharp.DeepSORT;
 using DeepSORT.Domain.Models.Detector;
 using DeepSORT.Domain.Models.Predictor;
+using DeepSORT.Application.DetectorUseCase;
+using DeepSORT.Application.WebCameraUseCase;
+using DeepSORT.Application.WebCameraUseCase.Create;
+using DeepSORT.Application.DetectorUseCase.Create;
 
 namespace CSharp.DeepSORT.ViewModels;
 public class MainWindowViewModel
@@ -15,16 +19,22 @@ public class MainWindowViewModel
     private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private object _lock = new object();
     private Detector _detector { get; }
-    private Predictor _predictor { get; }
+    private readonly int FPS = 15;
+    // private Predictor _predictor { get; }
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(DetectorUseCase detectorUseCase, WebCameraUseCase webCameraUseCase)
     {
         this.WebCamera = new CameraImage(null, "web");
-        ModelPath detectorModelPath = new ModelPath(AppContext.BaseDirectory + "./models/yolo11n.onnx");
-        ModelPath predictorModelPath = new ModelPath(AppContext.BaseDirectory + "./models/resnet18_conv5.onnx");
 
-        this._detector = new(detectorModelPath);
-        this._predictor = new(predictorModelPath);
+        WebCameraCreateCommand webCameraCreateCommand = new (this.FPS);
+        DetectorCreateCommand detectorCreateCommand = new(AppContext.BaseDirectory + "./models/yolo11n.onnx");
+
+        var Camera = webCameraUseCase.Create(webCameraCreateCommand);
+        this._detector = detectorUseCase.Create(detectorCreateCommand);
+
+/*        ModelPath predictorModelPath = new ModelPath(AppContext.BaseDirectory + "./models/resnet18_conv5.onnx");
+        this._predictor = new(predictorModelPath);*/
+
         Task.Run(StartCaptureImageAsync);
     }
 

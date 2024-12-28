@@ -10,7 +10,7 @@ public class WebCameraUseCase
         this.WebCameraFactory = webCameraFactory;
     }
 
-    public WebCamera CreateDetector(WebCameraCreateCommand command)
+    public WebCamera Create(WebCameraCreateCommand command)
     {
         WebCameraFps fps = new WebCameraFps(command.Fps);
         WebCamera webCamera =  this.WebCameraFactory.Create(fps);

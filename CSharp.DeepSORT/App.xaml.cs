@@ -1,4 +1,6 @@
-﻿using CSharp.DeepSORT.ViewModels;
+﻿using CSharp.DeepSORT;
+using CSharp.DeepSORT.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using System.Configuration;
 using System.Data;
 using System.Diagnostics;
@@ -11,6 +13,7 @@ namespace Csharp.DeepSORT
     /// </summary>
     public partial class App : Application
     {
+        public static IServiceProvider? ServiceProvider { get; private set; }
         protected override void OnStartup(StartupEventArgs e)
         {
             Debug.WriteLine("App Launch.");
@@ -26,11 +29,10 @@ namespace Csharp.DeepSORT
                 Debug.WriteLine($"{ex.Message} - {ex.Source}");
             }
 
-            // 初めに表示する画面の設定
-            var mainWindow = new MainWindow();
-            mainWindow.DataContext = new MainWindowViewModel();
+            ServiceProvider = PrepareServiceCollection.Initialize();
 
-            // 表示
+            var mainWindow = new MainWindow();
+            mainWindow.DataContext = ServiceProvider.GetRequiredService<MainWindowViewModel>();
             mainWindow.Show();
         }
 

@@ -10,7 +10,7 @@ public class DetectorUseCase
         this.DetectorFactory = detectorFactory;
     }
 
-    public Detector CreateDetector(DetectorCreateCommand command)
+    public Detector Create(DetectorCreateCommand command)
     {
         ModelPath modelPath = new ModelPath(command.ModelPath);
         Detector detector = this.DetectorFactory.Create(modelPath);
