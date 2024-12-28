@@ -1,5 +1,6 @@
 ﻿using CSharp.DeepSORT.ViewModels;
 using DeepSORT.Application.DetectorUseCase;
+using DeepSORT.Application.WebCameraUseCase;
 using DeepSORT.Domain.Models.Detector;
 using DeepSORT.Domain.Models.WebCamera;
 using DeepSORT.Infrastructure.Factory;
@@ -13,7 +14,7 @@ static public class PrepareServiceCollection
         serviceCollection.AddTransient<MainWindowViewModel>();
     }
 
-    private static void RegisterInfrastructure(IServiceCollection serviceCollection)
+    private static void RegisterRepository(IServiceCollection serviceCollection)
     {
         serviceCollection.AddSingleton<IDetectorFactory, DetectorFactory>();
         serviceCollection.AddSingleton<IWebCameraFactory, WebCameraFactory>();
@@ -26,6 +27,7 @@ static public class PrepareServiceCollection
     private static void RegisterUseCase(IServiceCollection serviceCollection)
     {
         serviceCollection.AddSingleton<DetectorUseCase>();
+        serviceCollection.AddSingleton<WebCameraUseCase>();
     }
 
     public static IServiceProvider Initialize()
@@ -35,7 +37,7 @@ static public class PrepareServiceCollection
         IServiceProvider serviceProvider;
 
         // 登録
-        RegisterInfrastructure(serviceCollection);
+        RegisterRepository(serviceCollection);
         RegisterService(serviceCollection);
         RegisterUseCase(serviceCollection);
         RegisterViewModel(serviceCollection);

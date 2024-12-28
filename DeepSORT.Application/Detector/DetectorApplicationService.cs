@@ -1,3 +1,4 @@
+using DeepSORT.Application.DetectorUseCase.Create;
 using DeepSORT.Domain.Models.Detector;
 
 namespace DeepSORT.Application.DetectorUseCase;
@@ -9,8 +10,10 @@ public class DetectorUseCase
         this.DetectorFactory = detectorFactory;
     }
 
-    public Detector CreateDetector(ModelPath modelPath)
+    public Detector CreateDetector(DetectorCreateCommand command)
     {
-        return this.DetectorFactory.Create(modelPath);
+        ModelPath modelPath = new ModelPath(command.ModelPath);
+        Detector detector = this.DetectorFactory.Create(modelPath);
+        return detector;
     }
 }
