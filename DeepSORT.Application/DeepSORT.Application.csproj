@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DeepSORT.Domain\DeepSORT.Domain.csproj" />
+    <ProjectReference Include="..\DeepSORT.Infrastructure\DeepSORT.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
