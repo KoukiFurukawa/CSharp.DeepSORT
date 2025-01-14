@@ -1,25 +1,25 @@
+using Csharp.DeepSORT;
 using CSharp.DeepSORT.Models;
+using CsharpByteTrack.ByteTracker;
+using CsharpByteTrack.ObjectDetection;
+using DeepSORT.Application.DetectorUseCase;
+using DeepSORT.Application.DetectorUseCase.Create;
+using DeepSORT.Application.WebCameraUseCase;
+using DeepSORT.Application.WebCameraUseCase.Create;
+using DeepSORT.Domain.Models.Detector;
+using DeepSORT.Domain.Models.Predictor;
+using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing;
-using OpenCvSharp;
-using OpenCvSharp.Extensions;
-using Csharp.DeepSORT;
-using DeepSORT.Domain.Models.Detector;
-using DeepSORT.Domain.Models.Predictor;
-using DeepSORT.Application.DetectorUseCase;
-using DeepSORT.Application.WebCameraUseCase;
-using DeepSORT.Application.WebCameraUseCase.Create;
-using DeepSORT.Application.DetectorUseCase.Create;
-using CsharpByteTrack.ByteTracker;
-using CsharpByteTrack.ObjectDetection;
 
 namespace CSharp.DeepSORT.ViewModels;
 public class MainWindowViewModel
 {
     public CameraImage WebCamera { get; private set; }
-    private CancellationTokenSource _cancellationTokenSource = new ();
-    private object Lock = new ();
+    private CancellationTokenSource _cancellationTokenSource = new();
+    private object Lock = new();
     private Detector Detector { get; }
     private MultiClassByteTracker Tracker { get; }
 
@@ -38,24 +38,24 @@ public class MainWindowViewModel
     {
         this.WebCamera = new CameraImage(null, "web");
 
-        WebCameraCreateCommand webCameraCreateCommand = new (this.FPS);
+        WebCameraCreateCommand webCameraCreateCommand = new(this.FPS);
         DetectorCreateCommand detectorCreateCommand = new(AppContext.BaseDirectory + "./models/yolo11n.onnx");
 
         var Camera = webCameraUseCase.Create(webCameraCreateCommand);
         this.Detector = detectorUseCase.Create(detectorCreateCommand);
         this.Tracker = new MultiClassByteTracker(FPS, trackThresh, trackBuffer, matchThresh, minBoxArea, mot20);
 
-/*        ModelPath predictorModelPath = new ModelPath(AppContext.BaseDirectory + "./models/resnet18_conv5.onnx");
-        this._predictor = new(predictorModelPath);*/
+        /*        ModelPath predictorModelPath = new ModelPath(AppContext.BaseDirectory + "./models/resnet18_conv5.onnx");
+                this._predictor = new(predictorModelPath);*/
 
         Task.Run(StartCaptureImageAsync);
     }
 
     private async Task StartCaptureImageAsync()
     {
-        BlockingCollection<Mat> frameBuffer = new (boundedCapacity: 10); // バッファに最大10フレーム
-        BlockingCollection<InspectionHistory> inspectionBuffer = new (boundedCapacity: 10); // バッファに最大10フレーム
-        BlockingCollection<Bitmap> showBuffer = new (boundedCapacity: 10); // バッファに最大10フレーム
+        BlockingCollection<Mat> frameBuffer = new(boundedCapacity: 10); // バッファに最大10フレーム
+        BlockingCollection<InspectionHistory> inspectionBuffer = new(boundedCapacity: 10); // バッファに最大10フレーム
+        BlockingCollection<Bitmap> showBuffer = new(boundedCapacity: 10); // バッファに最大10フレーム
 
         // 画像取得専用タスク -----------------------------------------------------------------------------------------------------
         _ = Task.Run(async () =>
@@ -107,7 +107,7 @@ public class MainWindowViewModel
                 {
                     Mat frame = frameBuffer.Take();
                     var (boxes, scores, classIds) = this.Detector.Inference(frame);
-                    InspectionHistory inspectionHistory = new (boxes, scores,classIds, frame);
+                    InspectionHistory inspectionHistory = new(boxes, scores, classIds, frame);
                     inspectionBuffer.Add(inspectionHistory);
                 }
                 catch (Exception ex)
@@ -132,7 +132,7 @@ public class MainWindowViewModel
                 {
                     InspectionHistory frame = inspectionBuffer.Take();
                     Bitmap image = BitmapConverter.ToBitmap(frame.Frame);
-                    var(tIds, tBboxes, tScores, tClassIds) = this.Tracker.Invoke(image, frame.Bboxes, frame.Scores, frame.ClassIds);
+                    var (tIds, tBboxes, tScores, tClassIds) = this.Tracker.Invoke(image, frame.Bboxes, frame.Scores, frame.ClassIds);
 
                     // トラッキングIDと連番の紐付け
                     foreach (string trackerId in tIds)
@@ -143,7 +143,7 @@ public class MainWindowViewModel
                             this.trackIdDict[trackerId] = newId;
                         }
                     }
-       
+
                     Mat debugImage = PredictionDrawer.DrawPrediction(
                         frame.Frame, scoreTh, tIds, tBboxes, tScores, tClassIds, trackIdDict
                     );

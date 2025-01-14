@@ -1,6 +1,6 @@
-using MathNet.Numerics.LinearAlgebra;
 using Accord.Math;
 using Accord.Math.Optimization;
+using MathNet.Numerics.LinearAlgebra;
 using OpenCvSharp;
 
 namespace CsharpByteTrack.ByteTracker;
@@ -295,7 +295,7 @@ public static class Matching
             {
                 jagged[i][j] = double.PositiveInfinity;
             }
-            
+
         }
         return jagged;
     }

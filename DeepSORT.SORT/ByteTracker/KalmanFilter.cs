@@ -300,9 +300,9 @@ public class KalmanFilter
 
     private static void Validate(Vector<double> mean, Matrix<double> covariance)
     {
-        for (int i= 0; i < mean.Count; i++)
+        for (int i = 0; i < mean.Count; i++)
         {
-            if 
+            if
             (
                 double.IsNaN(mean[i]) || double.IsInfinity(mean[i]) ||
                 double.IsNegativeInfinity(mean[i]) || double.IsPositiveInfinity(mean[i])
@@ -311,14 +311,14 @@ public class KalmanFilter
                 throw new Exception("Meanに 無効な値 を確認");
             }
         }
-        
+
         for (int i = 0; i < covariance.RowCount; i++)
         {
             for (int j = 0; j < covariance.ColumnCount; j++)
             {
-                if 
+                if
                 (
-                    double.IsNegative(covariance[i, j]) || double.IsNaN(covariance[i, j]) || 
+                    double.IsNegative(covariance[i, j]) || double.IsNaN(covariance[i, j]) ||
                     double.IsPositiveInfinity(covariance[i, j]) || double.IsNegativeInfinity(covariance[i, j])
                 )
                 {
@@ -326,7 +326,7 @@ public class KalmanFilter
                 }
             }
         }
-    } 
+    }
 
 }
 

@@ -1,8 +1,8 @@
-﻿using OpenCvSharp;
-using System.Collections.Generic;
-using CsharpByteTrack.ByteTracker;
+﻿using CsharpByteTrack.ByteTracker;
 using CsharpByteTrack.ObjectDetection;
+using OpenCvSharp;
 using OpenCvSharp.Extensions;
+using System.Collections.Generic;
 using System.Drawing;
 
 /*

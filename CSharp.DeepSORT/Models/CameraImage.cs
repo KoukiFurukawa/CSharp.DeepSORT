@@ -1,7 +1,7 @@
-using System.Drawing;
-using System.Windows.Media.Imaging;
-using System.IO;
 using System.ComponentModel;
+using System.Drawing;
+using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace CSharp.DeepSORT.Models;
 public class CameraImage : INotifyPropertyChanged
@@ -14,7 +14,7 @@ public class CameraImage : INotifyPropertyChanged
     {
         BitmapImage = image;
         CameraName = cameraName;
-        if (image == null )
+        if (image == null)
         {
             return;
         }
@@ -72,7 +72,7 @@ public class CameraImage : INotifyPropertyChanged
         {
             throw new ArgumentNullException(nameof(bitmapImage));
         }
-        return bitmapImage.Height; 
+        return bitmapImage.Height;
     }
 
     private int GetWidth(Bitmap bitmapImage)
@@ -81,7 +81,7 @@ public class CameraImage : INotifyPropertyChanged
         {
             throw new ArgumentNullException(nameof(bitmapImage));
         }
-        return bitmapImage.Width; 
+        return bitmapImage.Width;
     }
 
     public void UpdateImage(Bitmap image)
@@ -91,7 +91,7 @@ public class CameraImage : INotifyPropertyChanged
         // this.Height = GetHeight(image);
     }
 
-    
+
     private BitmapSource? ToBitmapSource(Bitmap? image)
     {
         if (image == null)
@@ -109,7 +109,7 @@ public class CameraImage : INotifyPropertyChanged
         //     }
         // }
         image.Save(memory, System.Drawing.Imaging.ImageFormat.Bmp);
-        
+
         memory.Position = 0;
 
         BitmapImage bitmapImage = new BitmapImage();
@@ -131,7 +131,7 @@ public class CameraImage : INotifyPropertyChanged
             BitmapEncoder encoder = new BmpBitmapEncoder(); // BMP形式でエンコード
             encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
             encoder.Save(memoryStream);
-            
+
             // MemoryStream を Bitmap に変換
             bitmap = new Bitmap(memoryStream);
         }

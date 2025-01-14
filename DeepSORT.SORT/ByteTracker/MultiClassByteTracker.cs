@@ -1,6 +1,6 @@
-using System.Drawing;
 using OpenCvSharp;
 using OpenCvSharp.Dnn;
+using System.Drawing;
 
 namespace CsharpByteTrack.ByteTracker;
 

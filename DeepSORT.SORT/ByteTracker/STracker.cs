@@ -1,7 +1,7 @@
-using System.Drawing;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
 using OpenCvSharp;
+using System.Drawing;
 
 namespace CsharpByteTrack.ByteTracker;
 public class STrack : BaseTrack
@@ -37,7 +37,7 @@ public class STrack : BaseTrack
             var (newMean, newCovariance) = this._kalmanFilter.Predict(meanState, this._covariance);
 
             Validate(newMean, newCovariance);
-            this._mean = newMean; 
+            this._mean = newMean;
             this._covariance = newCovariance;
         }
     }
@@ -95,7 +95,7 @@ public class STrack : BaseTrack
         var (newMean, newCovariance) = this._kalmanFilter.Initiate(TlwhToXyah(this._tlwh));
 
         Validate(newMean, newCovariance);
-        this._mean = newMean; 
+        this._mean = newMean;
         this._covariance = newCovariance;
 
         this.TrackletLen = 0;
@@ -113,7 +113,7 @@ public class STrack : BaseTrack
             this._mean, this._covariance, TlwhToXyah(newTrack.Tlwh));
 
         Validate(newMean, newCovariance);
-        this._mean = newMean; 
+        this._mean = newMean;
         this._covariance = newCovariance;
 
         this.TrackletLen = 0;
@@ -214,9 +214,9 @@ public class STrack : BaseTrack
 
     private static void Validate(Vector<double> mean, Matrix<double> covariance)
     {
-        for (int i= 0; i < mean.Count; i++)
+        for (int i = 0; i < mean.Count; i++)
         {
-            if 
+            if
             (
                 double.IsNaN(mean[i]) || double.IsInfinity(mean[i]) ||
                 double.IsNegativeInfinity(mean[i]) || double.IsPositiveInfinity(mean[i])
@@ -225,14 +225,14 @@ public class STrack : BaseTrack
                 throw new Exception("Meanに 無効な値 を確認");
             }
         }
-        
+
         for (int i = 0; i < covariance.RowCount; i++)
         {
             for (int j = 0; j < covariance.ColumnCount; j++)
             {
-                if 
+                if
                 (
-                    double.IsNegative(covariance[i, j]) || double.IsNaN(covariance[i, j]) || 
+                    double.IsNegative(covariance[i, j]) || double.IsNaN(covariance[i, j]) ||
                     double.IsPositiveInfinity(covariance[i, j]) || double.IsNegativeInfinity(covariance[i, j])
                 )
                 {
@@ -240,5 +240,5 @@ public class STrack : BaseTrack
                 }
             }
         }
-    } 
+    }
 }

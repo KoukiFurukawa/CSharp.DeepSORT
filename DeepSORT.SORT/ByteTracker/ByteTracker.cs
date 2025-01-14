@@ -1,7 +1,7 @@
 
-using System.Linq;
 using Accord.Math;
 using Accord.Statistics;
+using System.Linq;
 
 /*
 1. 物体クラスごとに生成されているクラスである

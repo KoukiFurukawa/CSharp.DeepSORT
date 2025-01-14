@@ -7,7 +7,7 @@ public class InspectionHistory
     public List<Rect> Bboxes { get; set; }
     public Mat Frame;
     public DateTime Timestamp;
-    
+
     public InspectionHistory(List<Rect> bboxes, List<float> scores, List<int> classIds, Mat image)
     {
         this.ClassIds = classIds;
