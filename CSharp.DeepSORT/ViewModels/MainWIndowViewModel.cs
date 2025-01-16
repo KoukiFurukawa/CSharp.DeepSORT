@@ -229,7 +229,7 @@ public class Alert
     {
         if (level == InspectionHistory.AlertLevel.DANGER)
         {
-            this.Level = 2; 
+            this.Level = 2;
         }
         else if (level == InspectionHistory.AlertLevel.CAUTION)
         {

@@ -47,7 +47,7 @@ public class InspectionHistory
         {
             Rect humanBboxes = Bboxes[humanIndexes[j]];
 
-            for (int k = 0; k < Bboxes.Count; k++) 
+            for (int k = 0; k < Bboxes.Count; k++)
             {
                 if (humanIndexes[j] == k) { continue; }
 
@@ -68,7 +68,7 @@ public class InspectionHistory
                 minRange = tempRange < minRange ? tempRange : minRange;
             }
         }
-        
+
         if (minRange < this.DANGER)
         {
             this.IsDanger = AlertLevel.DANGER;
@@ -79,7 +79,7 @@ public class InspectionHistory
         }
         else
         {
-            this.IsDanger= AlertLevel.NEUTRAL;
+            this.IsDanger = AlertLevel.NEUTRAL;
         }
 
         return;
