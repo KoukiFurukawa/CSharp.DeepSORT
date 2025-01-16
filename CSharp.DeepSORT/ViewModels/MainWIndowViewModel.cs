@@ -7,12 +7,14 @@ using DeepSORT.Application.DetectorUseCase.Create;
 using DeepSORT.Application.WebCameraUseCase;
 using DeepSORT.Application.WebCameraUseCase.Create;
 using DeepSORT.Domain.Models.Detector;
-using DeepSORT.Domain.Models.Predictor;
+using Newtonsoft.Json;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing;
+using System.Net.Http;
+using System.Text;
 
 namespace CSharp.DeepSORT.ViewModels;
 public class MainWindowViewModel
@@ -24,6 +26,13 @@ public class MainWindowViewModel
     private MultiClassByteTracker Tracker { get; }
 
     Dictionary<string, int> trackIdDict = new Dictionary<string, int>();
+
+    private HttpClient HttpClient = new HttpClient
+    {
+        BaseAddress = new Uri("http://10.77.96.91:8000/")
+    };
+    private readonly string POST_ENDPOINT = "";
+    private InspectionHistory.AlertLevel prevLevel = InspectionHistory.AlertLevel.NEUTRAL;
 
     private readonly int FPS = 15;
     private readonly double scoreTh = 0.3;
@@ -48,7 +57,7 @@ public class MainWindowViewModel
         /*        ModelPath predictorModelPath = new ModelPath(AppContext.BaseDirectory + "./models/resnet18_conv5.onnx");
                 this._predictor = new(predictorModelPath);*/
 
-        Task.Run(StartCaptureImageAsync);
+        _ = Task.Run(StartCaptureImageAsync);
     }
 
     private async Task StartCaptureImageAsync()
@@ -108,6 +117,8 @@ public class MainWindowViewModel
                     Mat frame = frameBuffer.Take();
                     var (boxes, scores, classIds) = this.Detector.Inference(frame);
                     InspectionHistory inspectionHistory = new(boxes, scores, classIds, frame);
+                    inspectionHistory.CalculateMinimumBboxesRange();
+
                     inspectionBuffer.Add(inspectionHistory);
                 }
                 catch (Exception ex)
@@ -144,6 +155,29 @@ public class MainWindowViewModel
                         }
                     }
 
+                    try
+                    {
+                        if (frame.IsDanger != this.prevLevel)
+                        {
+                            var person = new Alert(frame.IsDanger);
+                            var json = JsonConvert.SerializeObject(person);
+                            this.prevLevel = frame.IsDanger;
+
+                            // POSTリクエストを作成
+                            var request = new HttpRequestMessage(HttpMethod.Post, this.POST_ENDPOINT)
+                            {
+                                // Content-typeを明示的に指定
+                                Content = new StringContent(json, Encoding.UTF8, @"application/json")
+                            };
+
+                            _ = Task.Run(() =>
+                            {
+                                this.HttpClient.SendAsync(request);
+                            });
+                        }
+                    }
+                    catch (Exception ex) { throw new Exception(ex.Message); }
+
                     Mat debugImage = PredictionDrawer.DrawPrediction(
                         frame.Frame, scoreTh, tIds, tBboxes, tScores, tClassIds, trackIdDict
                     );
@@ -179,5 +213,31 @@ public class MainWindowViewModel
                 await Task.Delay(1);
             }
         });
+
+        this.HttpClient.Dispose();
+        Debug.WriteLine("HttpClient-Dispose");
+    }
+}
+
+[JsonObject]
+public class Alert
+{
+    [JsonProperty("level")]
+    public int Level { get; private set; }
+
+    public Alert(InspectionHistory.AlertLevel level)
+    {
+        if (level == InspectionHistory.AlertLevel.DANGER)
+        {
+            this.Level = 2;
+        }
+        else if (level == InspectionHistory.AlertLevel.CAUTION)
+        {
+            this.Level = 1;
+        }
+        else if (level == InspectionHistory.AlertLevel.NEUTRAL)
+        {
+            this.Level = 0;
+        }
     }
 }
