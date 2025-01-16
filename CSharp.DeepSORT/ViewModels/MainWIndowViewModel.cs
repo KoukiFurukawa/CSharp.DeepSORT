@@ -132,7 +132,7 @@ public class MainWindowViewModel
                                 Content = new StringContent(json, Encoding.UTF8, @"application/json")
                             };
 
-                            _ = Task.Run(() => 
+                            _ = Task.Run(() =>
                             {
                                 this.HttpClient.SendAsync(request);
                             });
@@ -227,7 +227,7 @@ public class Alert
     {
         if (level == InspectionHistory.AlertLevel.DANGER)
         {
-            this.Level = 2; 
+            this.Level = 2;
         }
         else if (level == InspectionHistory.AlertLevel.CAUTION)
         {
