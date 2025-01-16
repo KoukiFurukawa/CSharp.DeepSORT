@@ -16,8 +16,8 @@ public class InspectionHistory
         DANGER,
     }
 
-    private readonly int CAUTION = 100;
-    private readonly int DANGER = 50;
+    private readonly int CAUTION = 200;
+    private readonly int DANGER = 10;
 
     public InspectionHistory(List<Rect> bboxes, List<float> scores, List<int> classIds, Mat image)
     {

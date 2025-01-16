@@ -32,6 +32,7 @@ public class MainWindowViewModel
         BaseAddress = new Uri("http://10.77.96.91:8000/")
     };
     private readonly string POST_ENDPOINT = "";
+    private InspectionHistory.AlertLevel prevLevel = InspectionHistory.AlertLevel.NEUTRAL;
 
     private readonly int FPS = 15;
     private readonly double scoreTh = 0.3;
@@ -118,28 +119,6 @@ public class MainWindowViewModel
                     InspectionHistory inspectionHistory = new(boxes, scores, classIds, frame);
                     inspectionHistory.CalculateMinimumBboxesRange();
 
-                    try
-                    {
-                        if (inspectionHistory.IsDanger != InspectionHistory.AlertLevel.NEUTRAL)
-                        {
-                            var person = new Alert(inspectionHistory.IsDanger);
-                            var json = JsonConvert.SerializeObject(person);
-
-                            // POSTリクエストを作成
-                            var request = new HttpRequestMessage(HttpMethod.Post, this.POST_ENDPOINT)
-                            {
-                                // Content-typeを明示的に指定
-                                Content = new StringContent(json, Encoding.UTF8, @"application/json")
-                            };
-
-                            _ = Task.Run(() => 
-                            {
-                                this.HttpClient.SendAsync(request);
-                            });
-                        }
-                    }
-                    catch (Exception ex) { throw new Exception(ex.Message); }
-
                     inspectionBuffer.Add(inspectionHistory);
                 }
                 catch (Exception ex)
@@ -175,6 +154,29 @@ public class MainWindowViewModel
                             this.trackIdDict[trackerId] = newId;
                         }
                     }
+
+                    try
+                    {
+                        if (frame.IsDanger != this.prevLevel)
+                        {
+                            var person = new Alert(frame.IsDanger);
+                            var json = JsonConvert.SerializeObject(person);
+                            this.prevLevel = frame.IsDanger;
+
+                            // POSTリクエストを作成
+                            var request = new HttpRequestMessage(HttpMethod.Post, this.POST_ENDPOINT)
+                            {
+                                // Content-typeを明示的に指定
+                                Content = new StringContent(json, Encoding.UTF8, @"application/json")
+                            };
+
+                            _ = Task.Run(() =>
+                            {
+                                this.HttpClient.SendAsync(request);
+                            });
+                        }
+                    }
+                    catch (Exception ex) { throw new Exception(ex.Message); }
 
                     Mat debugImage = PredictionDrawer.DrawPrediction(
                         frame.Frame, scoreTh, tIds, tBboxes, tScores, tClassIds, trackIdDict
@@ -232,6 +234,10 @@ public class Alert
         else if (level == InspectionHistory.AlertLevel.CAUTION)
         {
             this.Level = 1;
+        }
+        else if (level == InspectionHistory.AlertLevel.NEUTRAL)
+        {
+            this.Level = 0;
         }
     }
 }
