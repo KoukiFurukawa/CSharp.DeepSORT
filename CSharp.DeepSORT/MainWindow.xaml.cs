@@ -11,13 +11,15 @@ namespace Csharp.DeepSORT
     public partial class MainWindow : System.Windows.Window
     {
         public static IServiceProvider? ServiceProvider { get; private set; }
+        private MainWindowViewModel context;
         /*        private readonly ModelPath _mockModelPath;
                 private readonly string IMAGE_PATH = AppContext.BaseDirectory + "./images/zidane.jpg";
                 private readonly string IMAGE_PATH2 = AppContext.BaseDirectory + "./images/dog.jpeg";*/
         public MainWindow()
         {
             ServiceProvider = PrepareServiceCollection.Initialize();
-            this.DataContext = ServiceProvider.GetRequiredService<MainWindowViewModel>();
+            this.context = ServiceProvider.GetRequiredService<MainWindowViewModel>();
+            this.DataContext = this.context;
             InitializeComponent();
             /*            string modelPath = AppContext.BaseDirectory + "./models/yolo11n.onnx";
                         *//*string modelPath2 = AppContext.BaseDirectory + "./models/resnet18-v1-7.onnx";*//*
@@ -50,6 +52,10 @@ namespace Csharp.DeepSORT
             {
                 e.Cancel = true;
                 return;
+            }
+            else
+            {
+                this.context.Close();
             }
         }
     }

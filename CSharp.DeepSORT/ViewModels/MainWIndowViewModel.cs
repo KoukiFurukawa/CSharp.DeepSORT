@@ -33,6 +33,9 @@ public class MainWindowViewModel
     };
     private readonly string POST_ENDPOINT = "";
     private InspectionHistory.AlertLevel prevLevel = InspectionHistory.AlertLevel.NEUTRAL;
+    private readonly bool isServer = false;
+
+    private Task inspectionTask;
 
     private readonly int FPS = 15;
     private readonly double scoreTh = 0.3;
@@ -57,7 +60,15 @@ public class MainWindowViewModel
         /*        ModelPath predictorModelPath = new ModelPath(AppContext.BaseDirectory + "./models/resnet18_conv5.onnx");
                 this._predictor = new(predictorModelPath);*/
 
-        _ = Task.Run(StartCaptureImageAsync);
+        this.inspectionTask = Task.Run(StartCaptureImageAsync);
+    }
+
+    public void Close()
+    {
+        this._cancellationTokenSource.Cancel();
+        Task.WaitAll(this.inspectionTask);
+
+        Debug.WriteLine("App-Controller Close.");
     }
 
     private async Task StartCaptureImageAsync()
@@ -76,7 +87,6 @@ public class MainWindowViewModel
                 return;
             }
 
-            await Task.Delay(1000);
             while (!_cancellationTokenSource.IsCancellationRequested)
             {
                 Mat image = new();
@@ -127,6 +137,7 @@ public class MainWindowViewModel
                 }
                 await Task.Delay(1);  // 適宜待機時間を挿入
             }
+            this.Detector.Close();
         });
 
         // 物体追跡 --------------------------------------------------------------------------------------------------------
@@ -157,7 +168,7 @@ public class MainWindowViewModel
 
                     try
                     {
-                        if (frame.IsDanger != this.prevLevel)
+                        if (frame.IsDanger != this.prevLevel && isServer)
                         {
                             var person = new Alert(frame.IsDanger);
                             var json = JsonConvert.SerializeObject(person);
@@ -189,6 +200,9 @@ public class MainWindowViewModel
                 }
                 await Task.Delay(1);  // 適宜待機時間を挿入
             }
+
+            this.HttpClient.Dispose();
+
         });
 
         // UI 更新専用タスク (バッファの内容を利用)
@@ -214,8 +228,6 @@ public class MainWindowViewModel
             }
         });
 
-        this.HttpClient.Dispose();
-        Debug.WriteLine("HttpClient-Dispose");
     }
 }
 
