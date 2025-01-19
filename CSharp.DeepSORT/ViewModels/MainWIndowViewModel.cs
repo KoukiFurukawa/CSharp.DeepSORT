@@ -133,7 +133,7 @@ public class MainWindowViewModel
                     inspectionHistory.CalculateMinimumBboxesRange();
 
                     inspectionBuffer.Add(inspectionHistory);
-                    this.logs.Add(new CoordinateInfo(inspectionHistory.Bboxes, inspectionHistory.ClassIds, inspectionHistory.Timestamp));
+                    this.logs.Add(new CoordinateInfo(inspectionHistory.Bboxes, inspectionHistory.ClassIds, inspectionHistory.Timestamp, inspectionHistory.IsDanger));
                 }
                 catch (Exception ex)
                 {
@@ -267,11 +267,25 @@ public class CoordinateInfo
     public List<int> classIds { get; private set; }
     [JsonProperty("timestamp")]
     public DateTime timestamp { get; private set; }
+    [JsonProperty("level")]
+    public int level { get; private set; }
 
-    public CoordinateInfo(List<Rect> _bboxes, List<int> _classIds, DateTime _timestamp)
+    public CoordinateInfo(List<Rect> _bboxes, List<int> _classIds, DateTime _timestamp, InspectionHistory.AlertLevel _level)
     {
         this.bboxes = _bboxes;
         this.classIds = _classIds;
         this.timestamp = _timestamp;
+        if (_level == InspectionHistory.AlertLevel.DANGER)
+        {
+            this.level = 2;
+        }
+        else if (_level == InspectionHistory.AlertLevel.CAUTION)
+        {
+            this.level = 1;
+        }
+        else if (_level == InspectionHistory.AlertLevel.NEUTRAL)
+        {
+            this.level = 0;
+        }
     }
 }
