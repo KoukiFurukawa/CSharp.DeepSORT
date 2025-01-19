@@ -13,6 +13,7 @@ using OpenCvSharp.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 
@@ -36,6 +37,7 @@ public class MainWindowViewModel
     private readonly bool isServer = false;
 
     private Task inspectionTask;
+    private List<CoordinateInfo> logs = [];
 
     private readonly int FPS = 15;
     private readonly double scoreTh = 0.3;
@@ -67,7 +69,8 @@ public class MainWindowViewModel
     {
         this._cancellationTokenSource.Cancel();
         Task.WaitAll(this.inspectionTask);
-
+        string json = JsonConvert.SerializeObject(this.logs);
+        File.WriteAllText("./CoordinateInfo.json", json);
         Debug.WriteLine("App-Controller Close.");
     }
 
@@ -130,6 +133,7 @@ public class MainWindowViewModel
                     inspectionHistory.CalculateMinimumBboxesRange();
 
                     inspectionBuffer.Add(inspectionHistory);
+                    this.logs.Add(new CoordinateInfo(inspectionHistory.Bboxes, inspectionHistory.ClassIds, inspectionHistory.Timestamp));
                 }
                 catch (Exception ex)
                 {
@@ -251,5 +255,23 @@ public class Alert
         {
             this.Level = 0;
         }
+    }
+}
+
+[JsonObject]
+public class CoordinateInfo
+{
+    [JsonProperty("bboxes")]
+    public List<Rect> bboxes { get; private set; }
+    [JsonProperty("classIds")]
+    public List<int> classIds { get; private set; }
+    [JsonProperty("timestamp")]
+    public DateTime timestamp { get; private set; }
+
+    public CoordinateInfo(List<Rect> _bboxes, List<int> _classIds, DateTime _timestamp)
+    {
+        this.bboxes = _bboxes;
+        this.classIds = _classIds;
+        this.timestamp = _timestamp;
     }
 }
