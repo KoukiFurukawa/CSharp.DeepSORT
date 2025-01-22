@@ -30,11 +30,11 @@ public class MainWindowViewModel
 
     private HttpClient HttpClient = new HttpClient
     {
-        BaseAddress = new Uri("http://10.77.96.91:8000/")
+        BaseAddress = new Uri("http://10.77.113.37:8000/")
     };
     private readonly string POST_ENDPOINT = "";
     private InspectionHistory.AlertLevel prevLevel = InspectionHistory.AlertLevel.NEUTRAL;
-    private readonly bool isServer = false;
+    private readonly bool isServer = true;
 
     private Task inspectionTask;
     private List<CoordinateInfo> logs = [];
@@ -69,6 +69,7 @@ public class MainWindowViewModel
     {
         this._cancellationTokenSource.Cancel();
         Task.WaitAll(this.inspectionTask);
+        Thread.Sleep(1000);
         string json = JsonConvert.SerializeObject(this.logs);
         File.WriteAllText("./CoordinateInfo.json", json);
         Debug.WriteLine("App-Controller Close.");
@@ -128,6 +129,7 @@ public class MainWindowViewModel
                 try
                 {
                     Mat frame = frameBuffer.Take();
+
                     var (boxes, scores, classIds) = this.Detector.Inference(frame);
                     InspectionHistory inspectionHistory = new(boxes, scores, classIds, frame);
                     inspectionHistory.CalculateMinimumBboxesRange();
@@ -142,6 +144,7 @@ public class MainWindowViewModel
                 await Task.Delay(1);  // 適宜待機時間を挿入
             }
             this.Detector.Close();
+            frameBuffer.CompleteAdding();
         });
 
         // 物体追跡 --------------------------------------------------------------------------------------------------------
@@ -205,6 +208,7 @@ public class MainWindowViewModel
                 await Task.Delay(1);  // 適宜待機時間を挿入
             }
 
+            inspectionBuffer.CompleteAdding();
             this.HttpClient.Dispose();
 
         });
@@ -230,6 +234,7 @@ public class MainWindowViewModel
                 }
                 await Task.Delay(1);
             }
+            showBuffer.CompleteAdding();
         });
 
     }
