@@ -4,13 +4,11 @@ import uvicorn
 import RPi.GPIO as GPIO
 import time
 import threading
-import keyboard
-
 import alert
 
 #ポート番号の定義
-Led_yellow = 18
-Led_red = 19
+Led_yellow = 17
+Led_red = 22
 
 #GPIOの設定
 GPIO.setmode(GPIO.BCM)              
@@ -21,6 +19,9 @@ GPIO.setup(Led_red, GPIO.OUT)
 level = None
 
 app = FastAPI()
+
+#現在時刻を取得
+start_time = dt.datetime.now()
 
 # リクエストbodyを定義
 class Approach(BaseModel):
@@ -39,7 +40,7 @@ def ring_alert():
     global Led_yellow ,Led_red, level
     prev_level = None
     try:
-        while not keyboard.is_pressed('q'):
+        while True:
             time.sleep(0.01)
 
             if level == prev_level:

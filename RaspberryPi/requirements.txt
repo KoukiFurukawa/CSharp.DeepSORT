@@ -1,5 +1,4 @@
-fastapi==0.115.6
-keyboard==0.13.5
-pydantic==2.10.3
+fastapi==0.115.7
+pydantic==2.10.6
 pygame==2.6.1
 uvicorn==0.34.0
