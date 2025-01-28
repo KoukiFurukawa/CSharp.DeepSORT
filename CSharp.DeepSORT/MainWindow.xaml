@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:Csharp.DeepSORT"
         mc:Ignorable="d"
         Closing="Window_Closing"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="960" Width="1280">
     <Grid>
-        <Image Width="480" Height="360" Source="{Binding WebCamera.Image}"></Image>
+        <Image Width="1280" Height="960" Source="{Binding WebCamera.Image}"></Image>
     </Grid>
 </Window>
